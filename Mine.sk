@@ -1,0 +1,28 @@
+On Break:
+    if "%region at player%" contains "mine":
+        if block is Coal Ore:
+            set {_number} to random integer from 1 to 8 
+            if {_number} is 1:
+                play sound "entity.chicken.hurt" at player
+            if {_number} is 2:
+                give player a Coal
+            if {_number} is 3:
+                give player a Coal
+            if {_number} is 4:
+                give player a Coal
+            if {_number} is 5:
+                give player a Coal
+            if {_number} is 6:
+                give player a Coal
+            if {_number} is 7:
+                give player a Emerald
+            if {_number} is 8:
+                give player a Diamond
+            set the block to bedrock
+            wait 20 seconds
+            set the block to Coal Ore
+        else:
+            cancel event
+on drop:
+    if event-item is Coal:
+        cancel event
