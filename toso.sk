@@ -1,0 +1,152 @@
+command /tosoreset:
+	trigger:
+		set {tosostatus} to 0
+		delete {sv::*}
+		delete {ht::*}
+		delete {tosojoin::*}
+		delete {svtp}
+		delete {http}
+		delete {htsttp}
+		delete {stoptp}
+		stop
+
+command /tosostatus:
+	trigger:
+		send "参加者 : %{tosojoin::*}%"
+		send "逃走者 : %{sv::*}%"
+		send "ハンター : %{ht::*}%"
+
+command /tosostart:
+	trigger:
+		if {tosotime} is 0:
+			set {tosotime} to 15
+		set {tosotime} to {tososavetime}
+		set {tosostatus} to 0
+		set {tosojikan} to 0
+		delete {sv::*}
+		delete {ht::*}
+		set {tosostatus} to 1
+		set gamemode of {tosojoin::*} to adventure
+		add {tosojoin::*} to {sv::*}
+		set {ht::*} to a random element out of {sv::*}
+		remove {ht::*} from {sv::*}
+		send "今回のハンターは「%{ht::*}%」です。" to {tosojoin::*}
+		teleport {ht::*} to {http}
+		teleport {sv::*} to {svtp}
+		set boots of {ht::*} to a leather boots
+		send "それでは、開始します。" to {tosojoin::*}
+		wait 3 Second
+		send title "&eハンターの解放まであと&6&l10&e秒..." with subtitle "&cハンターはまだ動けません！" to {tosojoin::*} for 1 second
+		wait 1 Second
+		send title "&eハンターの解放まであと&6&l9&e秒..." with subtitle "&cハンターはまだ動けません！" to {tosojoin::*} for 1 second
+		wait 1 Second
+		send title "&eハンターの解放まであと&6&l8&e秒..." with subtitle "&cハンターはまだ動けません！" to {tosojoin::*} for 1 second
+		wait 1 Second
+		send title "&eハンターの解放まであと&6&l7&e秒..." with subtitle "&cハンターはまだ動けません！" to {tosojoin::*} for 1 second
+		wait 1 Second
+		send title "&eハンターの解放まであと&6&l6&e秒..." with subtitle "&cハンターはまだ動けません！" to {tosojoin::*} for 1 second
+		wait 1 Second
+		send title "&eハンターの解放まであと&6&l5&e秒..." with subtitle "&cハンターはまだ動けません！" to {tosojoin::*} for 1 second
+		wait 1 Second
+		send title "&eハンターの解放まであと&6&l4&e秒..." with subtitle "&cハンターはまだ動けません！" to {tosojoin::*} for 1 second
+		wait 1 Second
+		send title "&eハンターの解放まであと&6&l3&e秒..." with subtitle "&cハンターはまだ動けません！" to {tosojoin::*} for 1 second
+		wait 1 Second
+		send title "&eハンターの解放まであと&6&l2&e秒..." with subtitle "&cハンターはまだ動けません！" to {tosojoin::*} for 1 second
+		wait 1 Second
+		send title "&eハンターの解放まであと&6&l1&e秒..." with subtitle "&cハンターはまだ動けません！" to {tosojoin::*} for 1 second
+		wait 1 Second
+		teleport {ht::*} to {htsttp}
+		send title "&aハンターが開放された！" with subtitle "&eRun for Escape" to {tosojoin::*}  for 1 second
+		set the walk speed of {ht::*} to 0.25
+		play sound "entity.player.levelup" at {tosojoin::*} 
+		set {tosojikan} to 1
+
+on damage:
+	if {ht::*} contains attacker:
+		if {sv::*} contains victim:
+			add victim to {lose::*}
+			set gamemode of {lose::*} to spectator
+			remove victim from {sv::*}
+			if {lose::*} is set:
+				send "%{lose::*}%が捕まっています。" to {tosojoin::*}
+				cancel event
+			else:
+				stop
+			
+
+every seconds:
+	if {tosojikan} is 1:
+		remove 1 from {tosotime}
+		send action bar "制限時間 : %{tosotime}% 秒" to {tosojoin::*}
+   
+every 1 second:
+	if {tosostatus} is 1:
+		if {sv::*} is not set:
+			set {tosostatus} to 0
+			set {tosojikan} to 0
+			send title "&6GAME OVER" with subtitle "&e逃走失敗..." to {tosojoin::*} for 2 second
+			set the walk speed of {ht::*} to 0.2
+			set boots of {ht::*} to a air
+			delete {ht::*} 
+			delete {lose::*}
+			set gamemode of {tosojoin::*} to survival
+			teleport {tosojoin::*} to {stoptp}
+			delete {tosojoin::*}
+			stop
+		if {tosotime} is 0:
+			set {tosostatus} to 0
+			set {tosojikan} to 0
+			send title "&6逃走成功" with subtitle "&e%{sv::*}%" to {tosojoin::*} for 5 second
+			play sound "ui.toast.challenge_complete" at {tosojoin::*}
+			set the walk speed of {ht::*} to 0.2
+			delete {sv::*}
+			set chestplate of {ht::*} to a air
+			delete {ht::*}
+			delete {lose::*}
+			wait 3 second
+			set gamemode of {tosojoin::*} to survival
+			teleport {tosojoin::*} to {stoptp}
+			delete {tosojoin::*}
+			stop
+
+
+command /tosoedit <text> [<int>]:
+	trigger:
+		if arg-1 is "svtp":
+			set {svtp} to player's location
+			send "&e%{svtp}%に逃走者の待機地点を設定しました！" to player
+			stop
+		if arg-1 is "http":
+			set {http} to player's location
+			send "&e%{http}%にハンターの待機地点を設定しました！" to player
+			stop
+		if arg-1 is "htsttp":
+			set {htsttp} to player's location
+			send "&e%{htsttp}%にハンターのスタート地点を設定しました！" to player
+		if arg-1 is "stoptp":
+			set {stoptp} to player's location
+			send "&e%{stoptp}%に終了後の待機地点を設定しました！" to player
+			stop
+		if arg-1 is "time":
+			set {tososavetime} to arg-2
+			send "&5タイマーの時間を%{tososavetime}%に変えました。" to player
+			stop
+
+on sign change:
+	if line 1 of event-block is "[tosogame]":
+		set line 1 of event-block to "&c[&bjoin the 逃走中&c]"
+		set line 3 of event-block to "&e&nクリックして参加する"
+
+on rightclick:
+	if line 1 of event-block is "&c[&bjoin the 逃走中&c]":
+		cancel event
+		if {tosojoin::*} doesn't contain player:
+			add player to {tosojoin::*}
+			send "&e逃走中の参加列に並びました！" to player
+			send "&e%{tosojoin::*}% が現在参加しています！" to {tosojoin::*}
+			play sound "block.note_block.pling" to player
+			stop
+		else:
+			send "&eすでに参加列に並んでいます。" to player
+			cancel event 
