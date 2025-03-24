@@ -30,11 +30,11 @@ command /tosostart:
 		add {tosojoin::*} to {sv::*}
 		set {ht::*} to a random element out of {sv::*}
 		remove {ht::*} from {sv::*}
-		send "今回のハンターは「%{ht::*}%」です。" to {tosojoin::*}
+		send "&e[&aゲームマスター&e]&a今回のハンターは「&4%{ht::*}%」&aです。" to {tosojoin::*}
 		teleport {ht::*} to {http}
 		teleport {sv::*} to {svtp}
 		set boots of {ht::*} to a leather boots
-		send "それでは、開始します。" to {tosojoin::*}
+		end "&e[&aゲームマスター&e]&aそれでは、&4開始&aします。" to {tosojoin::*}
 		wait 3 Second
 		send title "&eハンターの解放まであと&6&l10&e秒..." with subtitle "&cハンターはまだ動けません！" to {tosojoin::*} for 1 second
 		wait 1 Second
@@ -135,7 +135,7 @@ command /tosoedit <text> [<int>]:
 
 on sign change:
 	if line 1 of event-block is "[tosogame]":
-		set line 1 of event-block to "&c[&bjoin the 逃走中&c]"
+		set line 1 of event-block to "&c[&b逃走中&c]"
 		set line 3 of event-block to "&e&nクリックして参加する"
 
 on rightclick:
@@ -148,5 +148,8 @@ on rightclick:
 			play sound "block.note_block.pling" to player
 			stop
 		else:
-			send "&eすでに参加列に並んでいます。" to player
-			cancel event 
+			remove player from {tosojoin::*}
+			send "&e逃走中の参加列から離脱しました！" to player
+			send "&e%{tosojoin::*}% が現在参加しています！" to {tosojoin::*}
+			play sound "block.note_block.pling" to player
+			stop
