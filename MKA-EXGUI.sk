@@ -1,19 +1,62 @@
-command /gui:
-    permission: mka.ex
-    trigger:
-        open chest inventory with 1 row named "&a&l設営TPMENU" to player
-        set slot 1 of player's current inventory to Grass named "まいくらがくせいさいへ行く"
-        set slot 8 of player's current inventory to barrier named "閉じる"
+command /exgui:
+	permission: mka.ex
+	trigger:
+		open chest inventory with 3 row named "&a&l設営TPMENU" to player
+		set slot 0 of player's current inventory to Compass named "スポーンへ行く"
+		set slot 9 of player's current inventory to Book named "まいくらがくせいさいへ行く"
+		set slot 18 of player's current inventory to Grass Block named "MineServerExpoへ行く"
+		set slot 20 of player's current inventory to blue concrete named "RestServerのワールドへ行く"
+		set slot 26 of player's current inventory to Barrier named "閉じる"
 
 on inventory click:
-    name of clicked inventory is "&a&l設営MENU"
-    cancel event
-    if event-item is Grass named "まいくらがくせいさいへ行く":
-        if player has permission "mka.msc":
-            teleport player to location(-23, 65, 198, world "world")
-            send action bar "&aまいくらがくせいさいにテレポートしました！"
-        else:
-            send "&c権限がありません！" 
+	name of clicked inventory is "&a&l設営TPMENU"
+	cancel event
+	if event-item is Compass named "スポーンへ行く":
+		if player has permission "tp.spawn":
+			teleport player to {spawn}
+			play sound "entity.player.levelup" at player
+			send action bar "&aスポーンにテレポートしました！"
+		else:
+			send "&c権限がありません！" to player
+	if event-item is Book named "まいくらがくせいさいへ行く":
+		if player has permission "tp.msc":
+			teleport player to {msctp}
+			play sound "entity.player.levelup" at player
+			send action bar "&aまいくらがくせいさいにテレポートしました！"
+		else:
+			send "&c権限がありません！" to player
+	if event-item is Grass Block named "MineServerExpoへ行く":
+		if player has permission "tp.mse":
+			teleport player to {msftp}
+			play sound "entity.player.levelup" at player
+			send action bar "&aMineServerExpoにテレポートしました！"
+		else:
+			send "&c権限がありません！" to player
+	if event-item is blue concrete named "れすと鯖のワールドへ行く":
+		if player has permission "tp.mse.restserver":
+			teleport player to {msf.restserver.tp}
+			play sound "entity.player.levelup" at player
+			send action bar "&aれすと鯖にテレポートしました！"
+		else:
+			send "&c権限がありません！" to player
+	if event-item is Barrier named "閉じる":
+		close player's inventory
 
-    if event-item is barrier named "閉じる":
-        close player's inventory
+command /tpedit <text>:
+	trigger:
+		if arg-1 is "spawn":
+			set {spawn} to player's location
+			send "&e%{spawn}%にスポーン地点を設定しました！" to player
+			stop
+		if arg-1 is "msctp":
+			set {msctp} to player's location
+			send "&e%{msctp}%にまいくがらくせいさいのTP地点を設定しました！" to player
+			stop
+		if arg-1 is "msftp":
+			set {msftp} to player's location
+			send "&e%{msctp}%にMineServerExpoのTP地点を設定しました！" to player
+			stop
+		if arg-1 is "restservertp":
+			set {msf.restserver.tp} to player's location
+			send "&e%{msf.restserver.tp}%にれすと鯖ワールドのTP地点を設定しました！" to player
+			stop
